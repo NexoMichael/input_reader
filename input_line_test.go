@@ -18,10 +18,14 @@ func TestDefaultBuffer(t *testing.T) {
 	if 0 != len(buf.buf) {
 		t.Error("buffer default length should be 0")
 	}
+
+	if len(buf.Buffer()) != 0 {
+		t.Error("buffer should be empty")
+	}
 }
 
 func TestGetBufferConcurrent(t *testing.T) {
-	k := 1000000
+	k := 100000
 	// update loop
 	buf := NewBuffer()
 	go func() {
