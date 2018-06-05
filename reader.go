@@ -1,6 +1,6 @@
 // +build darwin dragonfly freebsd linux,!appengine netbsd openbsd
 
-package inputreader
+package inputreader // import "github.com/NexoMichael/inputreader"
 
 import (
 	"errors"
@@ -14,6 +14,7 @@ import (
 type InputReader struct {
 	oldState *unix.Termios
 	fd       int
+	stop     bool
 }
 
 // NewInputReader returns a new InputReader for *os.File pipe.
@@ -38,8 +39,7 @@ func NewInputReader(in *os.File) (*InputReader, error) {
 }
 
 func newTermios(termios unix.Termios) unix.Termios {
-	termios.Lflag |= unix.ISIG
-	termios.Lflag &^= (syscall.ICANON | syscall.IEXTEN)
+	termios.Lflag &^= (unix.ISIG | syscall.ICANON | syscall.IEXTEN)
 
 	termios.Iflag |= unix.ICRNL
 	termios.Iflag &^= (syscall.PARMRK | syscall.ISTRIP | syscall.IXON)

@@ -1,6 +1,6 @@
 // +build darwin dragonfly freebsd netbsd openbsd
 
-package inputreader
+package inputreader // import "github.com/NexoMichael/inputreader"
 
 import "golang.org/x/sys/unix"
 

@@ -3,13 +3,16 @@ package main
 import (
 	"fmt"
 	"os"
+	"syscall"
 
 	input "github.com/NexoMichael/inputreader"
 )
 
 func main() {
 	reader, _ := input.NewInputReader(os.Stdin)
-	defer reader.Close()
+	defer func() {
+		reader.Close()
+	}()
 
 	var b [1]byte
 	for {
@@ -19,5 +22,10 @@ func main() {
 		}
 
 		fmt.Printf(" - code is %d\n\r", b[0])
+
+		switch syscall.Signal(b[0]) {
+		case syscall.SIGQUIT, syscall.SIGTERM, syscall.SIGINT:
+			return
+		}
 	}
 }
