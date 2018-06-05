@@ -26,12 +26,12 @@ func TestGetBufferConcurrent(t *testing.T) {
 	buf := NewBuffer()
 	go func() {
 		for i := 0; i < k; i++ {
-			buf.Lock()
+			buf.lock.Lock()
 			buf.buf = append(buf.buf, 'a')
 			if i%1000 == 0 {
 				buf.buf = buf.buf[:0]
 			}
-			buf.Unlock()
+			buf.lock.Unlock()
 		}
 	}()
 	// read loop

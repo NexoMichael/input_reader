@@ -1,7 +1,6 @@
 package inputreader
 
 import (
-	"fmt"
 	"io"
 	"sync"
 )
@@ -10,7 +9,7 @@ import (
 type InputLine struct {
 	buf []byte
 
-	sync.Mutex
+	lock sync.Mutex
 }
 
 // NewBuffer returns new InputLine buffer with default size equal to 4 KB.
@@ -22,8 +21,8 @@ func NewBuffer() *InputLine {
 
 // Buffer returns current entered synmbols
 func (l *InputLine) Buffer() []byte {
-	l.Lock()
-	defer l.Unlock()
+	l.lock.Lock()
+	defer l.lock.Unlock()
 	buf := make([]byte, len(l.buf))
 	copy(buf, l.buf)
 	return buf
@@ -31,7 +30,6 @@ func (l *InputLine) Buffer() []byte {
 
 // ReadLine tries to return a single line, not including the end-of-line bytes.
 func (l *InputLine) ReadLine(r io.Reader) ([]byte, error) {
-	fmt.Println(1)
 	var b [1]byte
 	for {
 		n, err := r.Read(b[:])
@@ -46,16 +44,16 @@ func (l *InputLine) ReadLine(r io.Reader) ([]byte, error) {
 		case '\r':
 			continue
 		case '\n':
-			l.Lock()
+			l.lock.Lock()
 			buf := make([]byte, len(l.buf))
 			copy(buf, l.buf)
 			l.buf = l.buf[:0]
-			l.Unlock()
+			l.lock.Unlock()
 			return buf, nil
 		default:
-			l.Lock()
+			l.lock.Lock()
 			l.buf = append(l.buf, b[0])
-			l.Unlock()
+			l.lock.Unlock()
 		}
 	}
 	return nil, nil

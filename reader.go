@@ -28,27 +28,31 @@ func NewInputReader(in *os.File) (*InputReader, error) {
 		return nil, err
 	}
 
-	newState := *termios
-
-	newState.Lflag |= unix.ISIG
-	newState.Lflag &^= (syscall.ICANON | syscall.IEXTEN)
-
-	newState.Iflag |= unix.ICRNL
-	newState.Iflag &^= (syscall.PARMRK | syscall.ISTRIP | syscall.IXON)
-
-	newState.Oflag &^= syscall.OPOST
-
-	newState.Cflag |= syscall.CS8
-	newState.Cflag &^= (syscall.CSIZE | syscall.PARENB)
-
-	newState.Cc[syscall.VMIN] = 1
-	newState.Cc[syscall.VTIME] = 0
+	newState := newTermios(*termios)
 
 	if err := unix.IoctlSetTermios(fd, ioctlWriteTermios, &newState); err != nil {
 		return nil, err
 	}
 
 	return &InputReader{fd: fd, oldState: termios}, nil
+}
+
+func newTermios(termios unix.Termios) unix.Termios {
+	termios.Lflag |= unix.ISIG
+	termios.Lflag &^= (syscall.ICANON | syscall.IEXTEN)
+
+	termios.Iflag |= unix.ICRNL
+	termios.Iflag &^= (syscall.PARMRK | syscall.ISTRIP | syscall.IXON)
+
+	termios.Oflag &^= syscall.OPOST
+
+	termios.Cflag |= syscall.CS8
+	termios.Cflag &^= (syscall.CSIZE | syscall.PARENB)
+
+	termios.Cc[syscall.VMIN] = 1
+	termios.Cc[syscall.VTIME] = 0
+
+	return termios
 }
 
 // Read reads data into p.
