@@ -1,4 +1,4 @@
-package input_reader
+package inputreader
 
 import "golang.org/x/sys/unix"
 
